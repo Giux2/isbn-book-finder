@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Book isbn finder</title>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="container">
+<div class="row">
+<div class="col-md-12">
+<div class="jumbotron">
+<h1>ISBN Book Finder</h1>
+</div>
+
+<div class="col-md-6">
+<input id="isbn" class="string form-control" type="text" placeholder=" Insert ISBN here">
+</div>
+<button type="submit" id="invia" class="nascondi btn btn-default">Search</button>
+<button type="submit" id="reset" class="btn btn-danger">Reset</button>
+
+<div class="col-md-12">
+<div id="search_result"></div>
+</div>
+<div class="col-md-6">
+<p><input class="string form-control" id="c_release_image_title" value=""></p>
+<p><input class="string form-control" id="c_release_image_ISBN" value=""></p>
+<p><input class="string form-control" id="c_release_image_c_npages" value=""></p>
+<p><input class="string form-control" id="c_release_image_list_auth" value=""></p>
+<p><input class="string form-control" id="c_release_image_year_pub" value=""></p>
+<p><input class="string form-control" id="c_release_image_publisher" value=""></p>
+<p><input class="string form-control" id="c_release_image_lis_format" value=""></p>
+
+<button type="submit" id="" class="btn btn-success">ADD COMIC</button>
+</div>
+
+<script>
+$('#reset').click(function() {
+    location.reload();
+});
+
+
+$("#invia").click(function()
+{
+  isbn=$('#isbn').val();
+  $.getJSON( "https://www.googleapis.com/books/v1/volumes?q=isbn:" + isbn,
+  {isbn:isbn},
+  function( data ){
+  console.log(data);
+  console.log(data.items);
+
+  if (data.items){
+    if (data.items[0].volumeInfo.title){
+
+    var title = data.items[0].volumeInfo.title;
+    $('#c_release_image_title').val(title);
+    $('#c_release_image_ISBN').val(isbn);//non estratto dal json
+
+    var pages = data.items[0].volumeInfo.pageCount;
+    $('#c_release_image_c_npages').val(pages);
+
+
+    if(data.items[0].volumeInfo.authors){
+      var author_name =data.items[0].volumeInfo.authors;
+      $('#c_release_image_list_auth').val(author_name[0]);
+
+    }
+
+    if (data.items[0].volumeInfo.publishedDate){
+      var year = data.items[0].volumeInfo.publishedDate.slice(0,4);
+      $('#c_release_image_year_pub').val(year);
+    }
+
+    if(data.items[0].volumeInfo.imageLinks){
+      var cover = data.items[0].volumeInfo.imageLinks.thumbnail;
+    }
+    else{
+      cover=[];
+    }
+
+    if(data.items[0].volumeInfo.publisher){
+      var publisher = data.items[0].volumeInfo.publisher;
+      $('#c_release_image_publisher').val(publisher);
+
+    }
+      console.log('GTitle : ', title);
+      items=[]
+
+    if (cover.length != 0){
+      alert("Comic cover found, please download and put it in the form.")
+      var a = $("<a>").attr("href", cover).attr("download", "img.png").attr("target","_blank").appendTo("body");
+      a[0].click();
+      a.remove();
+
+      items.push('<div class="alert alert-success"><strong>YOU FOUND THIS DATA IN GOOGLE BOOKS:</strong><p> Title: ' + title + '</p><p>Author: ' + author_name + '</p><img src=' + cover + ' /><p>PLEASE COMPLETE THE FORM BELOW  AND SUBMIT</p></div>')
+    $('#search_result').append(items);
+    }
+    else{
+      items.push('<div class="alert alert-success"><strong>YOU FOUND THIS DATA IN GOOGLE BOOKS:</strong><p> Title: ' + title + '</p><p>Author: ' + author_name +'</p><p>PLEASE COMPLETE THE FORM BELOW AND SUBMIT</p></div>')
+    $('#search_result').append(items);
+  }
+}}
+  else{
+    $.getJSON( "https://openlibrary.org/api/books?bibkeys=ISBN:" + isbn + "&jscmd=details&format=json",
+    {isbn:isbn},
+    function( data ) {
+    console.log(data);
+
+    if (data["ISBN:"+isbn+""]){
+      if (data["ISBN:"+isbn+""].details.title){
+    var title = data["ISBN:"+isbn+""].details.title;
+    var pages = data["ISBN:"+isbn+""].details.number_of_pages;
+
+    if(data["ISBN:"+isbn+""].details.authors){
+      var author_name = data["ISBN:"+isbn+""].details.authors[0].name;
+    }
+
+    var format = data["ISBN:"+isbn+""].details.physical_format;
+
+    if (data["ISBN:"+isbn+""].details.publish_date){
+      var year = data["ISBN:"+isbn+""].details.publish_date.slice(-4);
+    }
+
+    if(data["ISBN:"+isbn+""].details.covers){
+      var cover = data["ISBN:"+isbn+""].details.covers[0];
+    }
+    else{
+      cover=[];
+    }
+
+    if(data["ISBN:"+isbn+""].details.publishers){
+      var publisher = data["ISBN:"+isbn+""].details.publishers[0];
+    }
+
+    var list_f=[[1,'comic book'],[2,'paperback'],[3,'tankobon'],[4,'hardcover'],[5,'magazine'],[6,'newspaper'],[7,'box']];
+    if (format != null){
+    for (var codeEntered in list_f)
+
+    if (format.toLowerCase() == list_f[codeEntered][1]) {
+        $("#c_release_image_list_format").val(list_f[codeEntered][0]);
+     }}
+    items=[]
+    $('#c_release_image_title').val(title);
+    $('#c_release_image_list_auth').val(author_name);
+    $('#c_release_image_c_npages').val(pages);
+    $('#c_release_image_ISBN').val(isbn);
+    $('#c_release_image_publisher').val(publisher);
+    $('#c_release_image_year_pub').val(year);
+    $('#c_release_image_lis_format').val(format);
+
+    if (cover.length != 0){
+      alert("Comic cover found, please download and put it in the form.")
+      var a = $("<a>").attr("href", "https://covers.openlibrary.org/b/id/"+ cover +".jpg").attr("download", "img.png").attr("target","_blank").appendTo("body");
+      a[0].click();
+      a.remove();
+
+      items.push('<div class="alert alert-success"><strong>YOU FOUND THIS DATA IN OPEN LIBRARY:</strong><p> Title: ' + title + '</p><p>Author: ' + author_name + '</p><img src="https://covers.openlibrary.org/b/id/'+ cover +'-S.jpg" /><p>PLEASE COMPLETE THE FORM BELOW  AND SUBMIT</p></div>')
+    $('#search_result').append(items);
+    }
+    else{
+      items.push('<div class="alert alert-success"><strong>YOU FOUND THIS DATA IN OPEN LIBRARY:</strong><p> Title: ' + title + '</p><p>Author: ' + author_name +'</p><p>PLEASE COMPLETE THE FORM BELOW AND SUBMIT</p></div>')
+    $('#search_result').append(items);
+  }
+}}
+  else{
+    items=[]
+    items.push('<div class="alert alert-danger"><strong>NOTHING FOUND, PLEASE UPLOAD MANUALLY</strong></div>')
+  $('#search_result').append(items);
+  }
+    console.log('OLTitle : ', title);
+  });
+  }
+
+
+});
+}
+
+)
+</script>
+</div>
+</div>
+</div>
+</body>
+</html>
