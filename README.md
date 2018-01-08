@@ -1,5 +1,6 @@
 # isbn-book-finder
-jQuery script to find books using ISBN (10-13). Built to search comics on the https://www.becomix.me database.
+jQuery script to find books using ISBN (10-13).
+Built to add comics on https://www.becomix.me.
 
 Developed by:
 https://github.com/Giux2/

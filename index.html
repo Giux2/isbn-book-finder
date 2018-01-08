@@ -25,13 +25,26 @@
 <div id="search_result"></div>
 </div>
 <div class="col-md-6">
+
+<h2>Form with the comic data:</h2>
 <p><input class="string form-control" id="c_release_image_title" value=""></p>
 <p><input class="string form-control" id="c_release_image_ISBN" value=""></p>
 <p><input class="string form-control" id="c_release_image_c_npages" value=""></p>
 <p><input class="string form-control" id="c_release_image_list_auth" value=""></p>
 <p><input class="string form-control" id="c_release_image_year_pub" value=""></p>
 <p><input class="string form-control" id="c_release_image_publisher" value=""></p>
-<p><input class="string form-control" id="c_release_image_lis_format" value=""></p>
+<p><select class="generic-widget form-control" id="c_release_image_list_format" name="list_format">
+	<option value="">Select one</option>
+	<option value="1">comic book</option>
+	<option value="2">paperback</option>
+	<option value="3">tankobon</option>
+	<option value="4">hardcover</option>
+	<option value="5">magazine</option>
+	<option value="6">newspaper</option>
+	<option value="7">box</option>
+	<option value="8">other</option>
+</select></p>
+
 
 <button type="submit" id="" class="btn btn-success">ADD COMIC</button>
 </div>
