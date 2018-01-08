@@ -2,11 +2,11 @@
 jQuery script to find books using ISBN (10-13).
 Built to add comics on https://www.becomix.me.
 
-##The script perform two different GET calls to: 
-1 Google book API
-2 Open Library API
+## The script perform two different GET calls to: 
+1. Google book API
+2. Open Library API
 
-##Developed by:
+## Developed by:
 * https://github.com/Giux2/
 * https://github.com/giack92
 
